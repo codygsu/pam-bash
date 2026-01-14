@@ -1,1 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pam’s Rad Retirement Bash — RSVP</title>
+  <style>
+    :root{
+      --poster-max: 720px;   /* max render size */
+      --bg: #000;
+      --hotpink: #ff2aa6;
+      --yellow: #ffd300;
+      --blue: #00a3ff;
+      --white: #ffffff;
+    }
 
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0b0b;
+      color: #fff;
+      padding: clamp(14px, 3vw, 28px);
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+    }
+
+    /* Poster container (scales, maintains 600x800 aspect) */
+    .poster{
+      width: min(100%, var(--poster-max));
+      aspect-ratio: 3 / 4;        /* 600x800 */
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      isolation: isolate;
+    }
+
+    /* Utility for each image layer */
+    .layer{
+      position: absolute;
+      inset: auto;
+      background-repeat: no-repeat;
+      background-size: contain;
+      pointer-events: none;
+      image-rendering: auto;
+    }
+
+    /* LAYERS (placeholders: swap to your PNGs) */
+
+    /* Big blue diagonal pattern */
+    .diag{
+      left: 6%;
+      top: 6%;
+      width: 62%;
+      height: 42%;
+      background-image: url("assets/pattern-diagonal-blue.png");
+      z-index: 1;
+      transform: rotate(0deg);
+    }
+
+    /* Sparkles overlay (optional) */
+    .sparkles{
+  position: absolute;
+  left: 4%;
+  top: 6%;
+  width: 18%;
+  height: 14%;
+     background-image: url("assets/sparkles.png");
+     background-repeat: no-repeat;
+     background-size: contain;
+     z-index: 4;          /* above patterns, below banner/title */
+  	 pointer-events: none;
+	}
+    /* Join Us banner */
+    .join{
+      left: 2%;
+      top: 5%;
+      width: 44%;
+      height: 16%;
+      background-image: url("assets/banner-joinus.png");
+      z-index: 5;
+      transform: rotate(-12deg);
+    }
+
+    /* Title stack (single PNG recommended) */
+    .title{
+      left: 9%;
+      top: 12%;
+      width: 58%;
+      height: 42%;
+      background-image: url("assets/title-stack.png");
+      z-index: 6;
+      transform: rotate(-8deg);
+    }
+
+    /* White chevrons under title */
+    .chevrons{
+      left: 54%;
+      top: 36%;
+      width: 7%;
+      height: 18%;
+      background-image: url("assets/chevrons-animated.gif");
+      z-index: 4;
+      transform: rotate(-8deg);
+      opacity: 0.95;
+    }
+
+    /* Date badge */
+    .date{
+      right: 4%;
+      top: 5%;
+      width: 28%;
+      height: 22%;
+      background-image: url("assets/badge-date-animated.gif");
+      z-index: 7;
+      transform: rotate(12deg);
+    }
+
+    /* “50” graphic on right */
+    .fifty{
+      right: 6%;
+      top: 33%;
+      width: 22%;
+      height: 22%;
+      background-image: url("assets/graphic-50.png");
+      z-index: 7;
+      transform: rotate(8deg);
+    }
+
+    /* Bottom dots/pattern */
+    .dots{
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 44%;
+      background-image: url("assets/pattern-dots-pink.png");
+      background-size: cover;
+      z-index: 0;
+    }
+
+    /* Boombox */
+    .boombox{
+      left: 6%;
+      bottom: 14%;
+      width: 42%;
+      height: 30%;
+      background-image: url("assets/boombox-animated-move.gif");
+      z-index: 6;
+      transform: rotate(-8deg);
+    }
+
+    /* Yellow panel background */
+    .panel{
+      right: 6%;
+      bottom: 18%;
+      width: 56%;
+      height: 22%;
+      background-image: url("assets/panel-yellow.png");
+      z-index: 5;
+    }
+	  /* Yellow panel WITH text baked in */
+.panel-info{
+  right: 6%;
+  bottom: 17%;
+  width: 56%;
+  height: 22%;
+  background-image: url("assets/panel-info.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* Address text as image */
+.address-img{
+  left: 0;
+  right: 0;
+  bottom: 4%;
+  height: 8%;
+  background-image: url("assets/address.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 8;
+  pointer-events: none;
+}
+
+    /* Text placed on top of yellow panel (live text = crisp) */
+    .panel-text{
+      position: absolute;
+      right: 8%;
+      bottom: 19.5%;
+      width: 52%;
+      height: 19%;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2%;
+      color: #0b0b0b;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .panel-text .time{
+      color: var(--hotpink);
+      font-size: clamp(18px, 4.2vw, 34px);
+      letter-spacing: .06em;
+      line-height: 1;
+      margin-bottom: 2%;
+    }
+    .panel-text .line{
+      font-size: clamp(14px, 3.2vw, 24px);
+      letter-spacing: .04em;
+      line-height: 1.05;
+    }
+
+    /* Address footer */
+    .address{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 4%;
+      z-index: 10;
+      text-align: center;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: clamp(12px, 2.6vw, 18px);
+      color: rgba(255,255,255,.95);
+      text-shadow: 0 8px 24px rgba(0,0,0,.55);
+      padding: 0 6%;
+      line-height: 1.25;
+    }
+
+    /* RSVP section */
+    .rsvp{
+      width: min(100%, var(--poster-max));
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: clamp(14px, 2.8vw, 20px);
+      backdrop-filter: blur(8px);
+    }
+
+    .rsvp h2{
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: .02em;
+    }
+    .rsvp p{
+      margin: 0 0 14px;
+      color: rgba(255,255,255,.78);
+      font-size: 14px;
+    }
+
+    form{ display: grid; gap: 12px; }
+    .grid{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+    label{
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.8);
+    }
+    input, select, button{
+      font: inherit;
+    }
+    input, select{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      color: #fff;
+      outline: none;
+    }
+    input:focus, select:focus{
+      border-color: rgba(255,255,255,.45);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.10);
+    }
+
+    .actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    button{
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: var(--yellow);
+      color: #0b0b0b;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    button:hover{ filter: brightness(1.05); }
+
+    .status{
+      min-height: 18px;
+      color: rgba(255,255,255,.85);
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .join{ width: 54%; }
+      .title{ width: 66%; left: 10%; }
+      .panel{ width: 64%; }
+      .panel-text{ width: 60%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="poster" aria-label="Pam’s Rad Retirement Bash invitation poster">
+    <div class="layer dots"></div>
+    <div class="layer diag"></div>
+    <div class="layer sparkles"></div>
+
+    <div class="layer join"></div>
+    <div class="layer title"></div>
+    <div class="layer chevrons"></div>
+
+    <div class="layer date"></div>
+    <div class="layer fifty"></div>
+
+    <div class="layer boombox"></div>
+    <div class="layer panel"></div>
+
+    <div class="layer panel-info"></div>
+    <div class="layer address-img"></div>
+  </div>
+
+  <section class="rsvp" aria-label="RSVP form">
+   <div data-tf-live="01KEYRPJSCXD820S3AJD3KY99W"></div><script src="//embed.typeform.com/next/embed.js"></script>
+  </section>
+
+  <script>
+    const form = document.getElementById("rsvpForm");
+    const statusEl = document.getElementById("status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting…";
+
+      const payload = Object.fromEntries(new FormData(form).entries());
+      console.log("RSVP payload:", payload);
+
+      // TODO: replace this with your real submission target
+      // e.g. fetch("/api/rsvp", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) })
+
+      await new Promise(r => setTimeout(r, 300));
+      statusEl.textContent = "Thanks! Your RSVP was recorded.";
+      form.reset();
+    });
+  </script>
+
+</body>
+</html>
